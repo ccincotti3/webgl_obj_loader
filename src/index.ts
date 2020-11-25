@@ -1,10 +1,11 @@
-import getGlInstance from "./gl"
+import getGLInstance from "./gl";
 
-const CANVAS_ID = "gl"
+const CANVAS_ID = "gl";
 
-const index = function() {
-    const gl = getGlInstance(CANVAS_ID)
-    return gl;
-}
+const index = function () {
+  const gl = getGLInstance(CANVAS_ID);
+
+  gl.setWindowSize(1, 1).setClearColor(1, 1, 1, 1);
+};
 
 index();
