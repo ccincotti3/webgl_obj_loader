@@ -1,13 +1,3 @@
-interface MyWebGL2RenderingContext extends WebGL2RenderingContext {
-  setWindowSize(wRatio: number, hRatio: number): MyWebGL2RenderingContext;
-  setClearColor(
-    red: number,
-    green: number,
-    blue: number,
-    alpha: number
-  ): MyWebGL2RenderingContext;
-}
-
 function GLInstance(id: string): MyWebGL2RenderingContext {
   const canvas = <HTMLCanvasElement>document.getElementById(id);
   const gl = <MyWebGL2RenderingContext>canvas.getContext("webgl2");
