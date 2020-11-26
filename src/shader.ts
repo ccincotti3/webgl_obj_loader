@@ -1,21 +1,24 @@
 const vectorShader = <VertexShaderType>`#version 300 es
+    in vec4 a_position;
     void main(void) {
-        gl_Position = vec4(1.0);
+        gl_Position = a_position;
     }
 `;
 
 const fragmentShader = <FragmentShaderType>`#version 300 es
-    precision mediump float;
+    precision highp float;
 
-    out vec3 color;
+    out vec4 color;
     void main(void) {
-        color = vec3(0.0);
+        color = vec4(1.0, 0, 0, 1.0);
     }
 `;
 
 export class Shader {
-  constructor(gl) {
-    this.program = ShaderUtil.createProgram(gl, vectorShader, fragmentShader);
+  program: WebGLProgram | null;
+  constructor(gl: MyWebGL2RenderingContext) {
+    const program = ShaderUtil.createProgram(gl, vectorShader, fragmentShader);
+    this.program = program;
   }
 }
 

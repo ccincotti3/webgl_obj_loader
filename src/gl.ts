@@ -13,8 +13,16 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
    * @param hRatio height percentage of screen
    */
   gl.setWindowSize = function (wRatio = 1, hRatio = 1) {
-    canvas.width = window.innerWidth * wRatio;
-    canvas.height = window.innerHeight * hRatio;
+    const w = window.innerWidth * wRatio;
+    const h = window.innerHeight * hRatio;
+
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+
+    canvas.width = w;
+    canvas.height = h;
+
+    this.viewport(0, 0, w, h);
 
     return this;
   };
