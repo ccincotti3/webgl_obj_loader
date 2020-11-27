@@ -20,13 +20,13 @@ const index = function () {
     0,
     0,
     0,
-    0.5 * Math.sqrt(3),
+    0.5 * Math.sqrt(2),
     0,
     0.25,
     0,
     0,
     0,
-    -0.5 * Math.sqrt(3),
+    -0.5 * Math.sqrt(2),
     0,
   ]);
 
@@ -34,10 +34,12 @@ const index = function () {
 
   const positionLocation = gl.getAttribLocation(program, "a_position");
 
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+
   const buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
 
   gl.enableVertexAttribArray(positionLocation);
   gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
