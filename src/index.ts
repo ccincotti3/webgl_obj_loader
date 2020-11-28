@@ -1,5 +1,6 @@
 import getGLInstance from "./gl";
 import { Shader } from "./shader";
+import Renderer from "./renderer";
 
 const CANVAS_ID = "gl";
 
@@ -15,47 +16,62 @@ const index = function () {
 
   gl.useProgram(program);
 
-  const vertices = new Float32Array([
-    -0.25,
-    0,
-    0,
-    0,
-    0.5 * Math.sqrt(2),
-    0,
-    0.25,
-    0,
-    0,
-    0,
-    -0.5 * Math.sqrt(2),
-    0,
-  ]);
+  // const vertices = new Float32Array([
+  //   -0.25,
+  //   0,
+  //   0,
+  //   0,
+  //   0.5 * Math.sqrt(2),
+  //   0,
+  //   0.25,
+  //   0,
+  //   0,
+  //   0,
+  //   -0.5 * Math.sqrt(2),
+  //   0,
+  // ]);
 
-  const indices = new Uint16Array([0, 1, 2, 2, 3, 0]);
+  // Coming from index.html, ideally this will be a dropzone in the future.
+  const data = document.getElementById("obj_file")?.innerHTML;
+
+  const lines = data?.split("\n");
+  let numberVertices: any[] = []; // will convert to floats afterward
+  let indexVertices: any[] = []; // will convert to floats afterward
+
+  lines?.forEach((untrimmedLine) => {
+    const line = untrimmedLine.trim(); // remove whitespace
+    const splitLine = line.split(" ");
+    const startingChar = splitLine[0];
+    switch (startingChar) {
+      case "v":
+        numberVertices = numberVertices.concat(splitLine.slice(1, 4)); // get the verts
+        break;
+      case "f":
+        indexVertices = indexVertices.concat(
+          splitLine.slice(1, 5).map((inds) => Number(inds[0]) - 1)
+        );
+        break;
+    }
+  });
+
+  const vertices = new Float32Array(numberVertices);
+
+  const indices = new Uint16Array(indexVertices);
+  console.log({ vertices, indices });
 
   const positionLocation = gl.getAttribLocation(program, "a_position");
 
-  const vao = gl.createVertexArray();
-  gl.bindVertexArray(vao);
+  const renderer = new Renderer(gl);
 
-  const buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  const obj = gl.createMeshVAO("object", indices, vertices, null, null);
 
-  gl.enableVertexAttribArray(positionLocation);
-  gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+  const rendererCallBack = () => {
+    gl.bindVertexArray(obj.vao);
+    gl.enableVertexAttribArray(positionLocation);
+  };
 
-  const indexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-
-  // UNSIGNED_SHORT, not UNSIGNED_INT
-  gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-
-  // Cleanup
-  gl.useProgram(null);
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-  gl.disableVertexAttribArray(positionLocation);
+  renderer.clear();
+  renderer.draw(rendererCallBack);
 };
 
-index();
+window.onload = () => index();

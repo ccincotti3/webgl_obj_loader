@@ -34,11 +34,69 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     alpha: number
   ) {
     this.clearColor(red, green, blue, alpha);
-    gl.clear(this.COLOR_BUFFER_BIT);
-    gl.clear(this.DEPTH_BUFFER_BIT);
-    gl.clear(this.STENCIL_BUFFER_BIT);
 
     return this;
+  };
+
+  gl.createMeshVAO = function (
+    name: string,
+    indices: Uint16Array,
+    vertices: Float32Array,
+    norms: Float32Array,
+    uvs: Float32Array
+  ): MeshObject {
+    const ATTR_POSITION_NAME = "a_position";
+    const ATTR_POSITION_LOC = 0;
+    const ATTR_NORMAL_NAME = "a_norm";
+    const ATTR_NORMAL_LOC = 1;
+    const ATTR_UV_NAME = "a_uv";
+    const ATTR_UV_LOC = 2;
+
+    const vao = gl.createVertexArray();
+    let vboVertices = null;
+    let vboNormals = null;
+    let vboUVs = null;
+    let ibo = null;
+
+    gl.bindVertexArray(vao);
+
+    if (vertices) {
+      vboVertices = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, vboVertices);
+      gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(ATTR_POSITION_LOC);
+      gl.vertexAttribPointer(ATTR_POSITION_LOC, 3, gl.FLOAT, false, 0, 0);
+    }
+
+    if (norms) {
+      vboNormals = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, vboNormals);
+      gl.bufferData(gl.ARRAY_BUFFER, norms, gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(ATTR_POSITION_LOC);
+      gl.vertexAttribPointer(ATTR_POSITION_LOC, 3, gl.FLOAT, false, 0, 0);
+    }
+    if (uvs) {
+      vboUVs = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, vboUVs);
+      gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(ATTR_POSITION_LOC);
+      gl.vertexAttribPointer(ATTR_POSITION_LOC, 3, gl.FLOAT, false, 0, 0);
+    }
+
+    if (indices) {
+      ibo = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+    }
+
+    return {
+      name,
+      vao,
+      vboVertices,
+      vboNormals,
+      vboUVs,
+      ibo,
+    };
   };
 
   return gl;
