@@ -1,6 +1,7 @@
 import getGLInstance from "./gl";
 import { Shader } from "./shader";
 import Renderer from "./renderer";
+import { Matrix4, Vector3 } from "../vendor/math";
 
 const CANVAS_ID = "gl";
 
@@ -60,6 +61,25 @@ const index = function () {
   console.log({ vertices, indices });
 
   const positionLocation = gl.getAttribLocation(program, "a_position");
+  const matrixPosition = gl.getUniformLocation(program, "u_MVP");
+
+  const proj = Matrix4.identity();
+
+  const viewProj = new Matrix4();
+  Matrix4.perspective(
+    viewProj.raw,
+    45,
+    gl.canvas.width / gl.canvas.height,
+    0.1,
+    100.0
+  );
+
+  viewProj.vtranslate(new Vector3(0, 0.0, -4.0));
+
+  const mvpData = Matrix4.identity();
+  Matrix4.mult(mvpData, proj, viewProj.raw);
+
+  gl.uniformMatrix4fv(matrixPosition, false, mvpData);
 
   const renderer = new Renderer(gl);
 
