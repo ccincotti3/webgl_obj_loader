@@ -14,7 +14,7 @@ class Renderer {
 
   draw(cb: () => void): this {
     cb();
-    
+
     // UNSIGNED_SHORT, not UNSIGNED_INT
     this.gl.drawElements(this.gl.TRIANGLES, 24, this.gl.UNSIGNED_SHORT, 0);
 
