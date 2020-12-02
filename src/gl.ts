@@ -42,11 +42,11 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
   };
 
   gl.createMeshVAO = function (
-    name: string,
-    indices: Uint16Array,
-    vertices: Float32Array,
-    norms: Float32Array,
-    uvs: Float32Array
+    name,
+    indices,
+    vertices,
+    norms,
+    uvs
   ): MeshObject {
     const ATTR_POSITION_NAME = "a_position";
     const ATTR_POSITION_LOC = 0;
@@ -64,9 +64,13 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     gl.bindVertexArray(vao);
 
     if (vertices) {
+      const data =
+        vertices instanceof Float32Array
+          ? vertices
+          : new Float32Array(vertices);
       vboVertices = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, vboVertices);
-      gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+      gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
       gl.enableVertexAttribArray(ATTR_POSITION_LOC);
       gl.vertexAttribPointer(ATTR_POSITION_LOC, 3, gl.FLOAT, false, 0, 0);
     }
@@ -87,9 +91,11 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     }
 
     if (indices) {
+      const data =
+        indices instanceof Uint16Array ? indices : new Uint16Array(indices);
       ibo = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
     }
 
     return {

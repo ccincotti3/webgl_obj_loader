@@ -12,19 +12,34 @@ class Renderer {
     Renderer.exists = true;
   }
 
-  draw(cb: () => void): this {
-    this.clear();
-    cb();
+  draw(cb: () => void): void {
+    let then = 0;
+    const loop = (now: number) => {
+      cb();
 
-    // UNSIGNED_SHORT, not UNSIGNED_INT
-    this.gl.drawElements(this.gl.TRIANGLES, 36, this.gl.UNSIGNED_SHORT, 0);
+      if (then === 0) {
+        then = now;
+      }
 
-    // Cleanup
-    // this.gl.useProgram(null);
-    // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-    // this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
-    requestAnimationFrame(() => this.draw(cb));
-    return this;
+      const fps = 120;
+      const interval = 1000 / fps;
+      const delta = now - then;
+
+      if (delta >= interval) {
+        this.clear();
+        // UNSIGNED_SHORT, not UNSIGNED_INT
+        this.gl.drawElements(this.gl.TRIANGLES, 36, this.gl.UNSIGNED_SHORT, 0);
+        then = now - (delta % interval);
+      }
+      // Cleanup
+      // this.gl.useProgram(null);
+      // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+      // this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+      requestAnimationFrame(loop);
+      return;
+    };
+    requestAnimationFrame(loop);
+    return;
   }
 
   clear(): this {

@@ -10,52 +10,36 @@ const index = function () {
   const gl = getGLInstance(CANVAS_ID);
 
   gl.setWindowSize(1, 1).setClearColor(1, 1, 1, 1);
-  const shader = new Shader(gl);
-  const program = shader.program;
+  const { program } = new Shader(gl);
   if (!program) {
     return null;
   }
 
   gl.useProgram(program);
 
-  // const vertices = new Float32Array([
-  //   -0.25,
-  //   0,
-  //   0,
-  //   0,
-  //   0.5 * Math.sqrt(2),
-  //   0,
-  //   0.25,
-  //   0,
-  //   0,
-  //   0,
-  //   -0.5 * Math.sqrt(2),
-  //   0,
-  // ]);
-
   // Coming from index.html, ideally this will be a dropzone in the future.
   const data = document.getElementById("obj_file")?.innerHTML;
+  if (!data) {
+    alert("Object data not found");
+    return null;
+  }
 
-  const datao = Model.loadObjectSourceToVertices(data);
+  const { vertices, indices } = Model.loadObjectSourceToVertices(data);
+  const mesh = gl.createMeshVAO("object", indices, vertices, null, null);
 
-  const vertices = new Float32Array(datao.vertices);
-
-  const indices = new Uint16Array(datao.indices);
-  console.log({ vertices, indices });
+  const model = new Model(mesh);
 
   const positionLocation = gl.getAttribLocation(program, "a_position");
   const matrixPosition = gl.getUniformLocation(program, "u_MVP");
 
   const renderer = new Renderer(gl);
 
-  const obj = gl.createMeshVAO("object", indices, vertices, null, null);
   const viewProj = new Matrix4();
   const proj = new Matrix4();
 
-  let angle = 0
+  let angle = 0;
 
   const rendererCallBack = () => {
-
     Matrix4.perspective(
       viewProj.raw,
       45,
@@ -64,14 +48,17 @@ const index = function () {
       100.0
     );
 
-    viewProj.vtranslate(new Vector3(0, 0.0, -4.0)).rotateY(angle / 180).rotateX(angle / 180);
+    viewProj
+      .vtranslate(new Vector3(0, 0.0, -4.0))
+      .rotateY(angle / 180)
+      .rotateX(angle / 180);
     angle += 1;
 
     const mvpData = Matrix4.identity();
     Matrix4.mult(mvpData, proj.raw, viewProj.raw);
 
     gl.uniformMatrix4fv(matrixPosition, false, mvpData);
-    gl.bindVertexArray(obj.vao);
+    gl.bindVertexArray(model.mesh.vao);
     gl.enableVertexAttribArray(positionLocation);
   };
 

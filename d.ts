@@ -8,8 +8,8 @@ interface MyWebGL2RenderingContext extends WebGL2RenderingContext {
   ): MyWebGL2RenderingContext;
   createMeshVAO(
     name: string,
-    indices: Uint16Array | null,
-    vertices: Float32Array | null,
+    indices: number[] | Uint16Array | null,
+    vertices: number[] | Float32Array | null,
     norms: Float32Array | null,
     uvs: Float32Array | null
   ): MeshObject;
