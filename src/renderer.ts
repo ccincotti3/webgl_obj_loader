@@ -13,16 +13,17 @@ class Renderer {
   }
 
   draw(cb: () => void): this {
+    this.clear();
     cb();
 
     // UNSIGNED_SHORT, not UNSIGNED_INT
-    this.gl.drawElements(this.gl.TRIANGLES, 24, this.gl.UNSIGNED_SHORT, 0);
+    this.gl.drawElements(this.gl.TRIANGLES, 36, this.gl.UNSIGNED_SHORT, 0);
 
     // Cleanup
-    this.gl.useProgram(null);
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
-
+    // this.gl.useProgram(null);
+    // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+    // this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+    requestAnimationFrame(() => this.draw(cb));
     return this;
   }
 

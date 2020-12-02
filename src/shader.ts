@@ -1,9 +1,9 @@
 const vectorShader = <VertexShaderType>`#version 300 es
-    in vec4 a_position;
+    in vec3 a_position;
 
     uniform mat4 u_MVP;
     void main(void) {
-        gl_Position = u_MVP * a_position;
+        gl_Position = u_MVP * vec4(a_position, 1.0);
     }
 `;
 

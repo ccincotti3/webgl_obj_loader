@@ -27,6 +27,9 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     return this;
   };
 
+  gl.enable(gl.CULL_FACE);
+  gl.enable(gl.DEPTH_TEST);
+
   gl.setClearColor = function (
     red: number,
     green: number,
@@ -80,7 +83,7 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
       gl.bindBuffer(gl.ARRAY_BUFFER, vboUVs);
       gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
       gl.enableVertexAttribArray(ATTR_POSITION_LOC);
-      gl.vertexAttribPointer(ATTR_POSITION_LOC, 3, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(ATTR_POSITION_LOC, 2, gl.FLOAT, false, 0, 0);
     }
 
     if (indices) {
