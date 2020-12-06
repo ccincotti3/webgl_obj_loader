@@ -2,6 +2,7 @@ import getGLInstance from "./gl";
 import { Shader } from "./shader";
 import Renderer from "./renderer";
 import Model from "./model";
+import { Camera, CameraController } from "./camera";
 import { Matrix4, Vector3 } from "../vendor/math";
 
 const CANVAS_ID = "gl";
@@ -33,29 +34,23 @@ const index = function () {
   const matrixPosition = gl.getUniformLocation(program, "u_MVP");
 
   const renderer = new Renderer(gl);
-
-  const viewProj = new Matrix4();
+  const camera = new Camera(gl);
+  new CameraController(gl, camera);
   const proj = new Matrix4();
 
-  let angle = 0;
+  const angle = 0;
 
   const rendererCallBack = () => {
-    Matrix4.perspective(
-      viewProj.raw,
-      45,
-      gl.canvas.width / gl.canvas.height,
-      0.1,
-      100.0
-    );
+    // camera.projectionMatrix.vtranslate(new Vector3(0, 0.0, -4.0));
+    //   .rotateY(angle / 180)
+    //   .rotateX(angle / 180);
+    // angle += 1;
 
-    viewProj
-      .vtranslate(new Vector3(0, 0.0, -4.0))
-      .rotateY(angle / 180)
-      .rotateX(angle / 180);
-    angle += 1;
+    camera.updateViewMatrix();
 
     const mvpData = Matrix4.identity();
-    Matrix4.mult(mvpData, proj.raw, viewProj.raw);
+
+    Matrix4.mult(mvpData, camera.projectionMatrix.raw, camera.viewMatrixState);
 
     gl.uniformMatrix4fv(matrixPosition, false, mvpData);
     gl.bindVertexArray(model.mesh.vao);

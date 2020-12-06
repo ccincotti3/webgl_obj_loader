@@ -1,4 +1,5 @@
 interface MyWebGL2RenderingContext extends WebGL2RenderingContext {
+  canvas: HTMLCanvasElement;
   setWindowSize(wRatio: number, hRatio: number): MyWebGL2RenderingContext;
   setClearColor(
     red: number,
