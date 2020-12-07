@@ -12,7 +12,7 @@ class Renderer {
     Renderer.exists = true;
   }
 
-  draw(cb: () => void, indexCount: number): void {
+  draw(cb: () => void): void {
     let then = 0;
     const loop = (now: number) => {
       cb();
@@ -27,13 +27,7 @@ class Renderer {
 
       if (delta >= interval) {
         this.clear();
-        // UNSIGNED_SHORT, not UNSIGNED_INT
-        this.gl.drawElements(
-          this.gl.TRIANGLES,
-          indexCount,
-          this.gl.UNSIGNED_SHORT,
-          0
-        );
+        cb();
         then = now - (delta % interval);
       }
       // Cleanup

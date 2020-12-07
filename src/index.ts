@@ -11,12 +11,7 @@ const index = function () {
   const gl = getGLInstance(CANVAS_ID);
 
   gl.setWindowSize(1, 1).setClearColor(1, 1, 1, 1);
-  const { program } = new Shader(gl);
-  if (!program) {
-    return null;
-  }
-
-  gl.useProgram(program);
+  const shader = new Shader(gl);
 
   // Coming from index.html, ideally this will be a dropzone in the future.
   const data = document.getElementById("obj_file")?.innerHTML;
@@ -30,35 +25,23 @@ const index = function () {
 
   const model = new Model(mesh);
 
-  const positionLocation = gl.getAttribLocation(program, "a_position");
-  const matrixPosition = gl.getUniformLocation(program, "u_MVP");
-
-  const renderer = new Renderer(gl);
   const camera = new Camera(gl);
   new CameraController(gl, camera);
-  const proj = new Matrix4();
 
-  const angle = 0;
+  const renderer = new Renderer(gl);
 
+  // TODO: if we add auto rotate again, need to rethink fps cb location.
   const rendererCallBack = () => {
-    // camera.projectionMatrix.vtranslate(new Vector3(0, 0.0, -4.0));
-    //   .rotateY(angle / 180)
-    //   .rotateX(angle / 180);
-    // angle += 1;
-
     camera.updateViewMatrix();
-
+    // calculate MVP
     const mvpData = Matrix4.identity();
-
     Matrix4.mult(mvpData, camera.projectionMatrix.raw, camera.viewMatrixState);
 
-    gl.uniformMatrix4fv(matrixPosition, false, mvpData);
-    gl.bindVertexArray(model.mesh.vao);
-    gl.enableVertexAttribArray(positionLocation);
+    shader.activate().preRender(mvpData).render(model).deactivate();
   };
 
   renderer.clear();
-  renderer.draw(rendererCallBack, model.mesh.indexCount);
+  renderer.draw(rendererCallBack);
 };
 
 window.onload = () => index();

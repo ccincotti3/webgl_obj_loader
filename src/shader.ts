@@ -1,3 +1,4 @@
+import { Matrix4 } from "../vendor/math.js";
 const vectorShader = <VertexShaderType>`#version 300 es
     in vec3 a_position;
 
@@ -18,9 +19,49 @@ const fragmentShader = <FragmentShaderType>`#version 300 es
 
 export class Shader {
   program: WebGLProgram | null;
+  gl: MyWebGL2RenderingContext;
+  positionLocation: number;
+  matrixPosition: WebGLUniformLocation | null;
   constructor(gl: MyWebGL2RenderingContext) {
     const program = ShaderUtil.createProgram(gl, vectorShader, fragmentShader);
     this.program = program;
+
+    if (this.program) {
+      this.gl = gl;
+      this.positionLocation = this.gl.getAttribLocation(
+        this.program,
+        "a_position"
+      );
+      this.matrixPosition = this.gl.getUniformLocation(this.program, "u_MVP");
+    }
+  }
+
+  activate(): this {
+    this.gl.useProgram(this.program);
+    return this;
+  }
+  deactivate(): this {
+    this.gl.useProgram(null);
+    return this;
+  }
+
+  preRender(mvpData: Matrix4): this {
+    this.gl.uniformMatrix4fv(this.matrixPosition, false, mvpData);
+    return this;
+  }
+
+  render(model): this {
+    this.gl.bindVertexArray(model.mesh.vao);
+    this.gl.enableVertexAttribArray(0);
+
+    // UNSIGNED_SHORT, not UNSIGNED_INT
+    this.gl.drawElements(
+      this.gl.TRIANGLES,
+      model.mesh.indexCount,
+      this.gl.UNSIGNED_SHORT,
+      0
+    );
+    return this;
   }
 }
 
