@@ -23,6 +23,7 @@ type MeshObject = {
   vboUVs: WebGLBuffer | null;
   vboNormals: WebGLBuffer | null;
   ibo: WebGLBuffer | null;
+  indexCount: number | null;
 };
 type FragmentShaderType = string;
 type VertexShaderType = string;

@@ -58,7 +58,7 @@ const index = function () {
   };
 
   renderer.clear();
-  renderer.draw(rendererCallBack);
+  renderer.draw(rendererCallBack, model.mesh.indexCount);
 };
 
 window.onload = () => index();

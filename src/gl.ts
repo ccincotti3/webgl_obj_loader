@@ -60,6 +60,7 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     let vboNormals = null;
     let vboUVs = null;
     let ibo = null;
+    let indexCount = null;
 
     gl.bindVertexArray(vao);
 
@@ -93,6 +94,7 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     if (indices) {
       const data =
         indices instanceof Uint16Array ? indices : new Uint16Array(indices);
+      indexCount = indices.length;
       ibo = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
@@ -105,6 +107,7 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
       vboNormals,
       vboUVs,
       ibo,
+      indexCount,
     };
   };
 
