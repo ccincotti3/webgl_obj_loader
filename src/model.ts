@@ -11,8 +11,10 @@ class Model {
 
     // Store what's in the object file here
     const sourceVertices: number[][] = [];
+    const sourceUV: number[][] = [];
 
     const finalVertices: number[] = []; // float32
+    const finalUV: number[] = []; // float32
     const finalIndices: number[] = []; //uInt16
 
     const cache: { [vertices: string]: number } = {};
@@ -26,29 +28,48 @@ class Model {
         case "v":
           sourceVertices.push(splitLine.slice(1).map(parseFloat)); // get the verts
           break;
+        case "vt":
+          sourceUV.push(splitLine.slice(1).map(parseFloat)); // get the UV coord
+          break;
         case "f": {
           const indices = splitLine
             .slice(1)
-            .map((inds) => Number(inds.split("/")[0]) - 1);
+            .map((inds) => inds.split("/"))
+            .map((inds) => {
+              const [vI, uvI, nI] = inds;
+              return [
+                vI ? Number(vI) - 1 : null,
+                uvI ? Number(uvI) - 1 : null,
+                nI ? Number(nI) - 1 : null,
+              ];
+            });
           const isQuad = indices.length > 3;
-          const lastIndex = isQuad ? indices.pop() : undefined;
+          const lastFace = isQuad ? indices.pop() : undefined;
 
           // Push in the verts of the triangle
           indices.forEach((i) => {
-            const cachedIndex = cache[i];
+            const keyForCache = String(i);
+            const cachedIndex = cache[keyForCache];
             if (cachedIndex) {
               finalIndices.push(cachedIndex);
             } else {
+              const [vI, uvI, nI] = i;
               finalIndices.push(cnt);
-              finalVertices.push(...sourceVertices[i]);
-              cache[i] = cnt;
+              if (vI !== null) {
+                finalVertices.push(...sourceVertices[vI]);
+              }
+              if (uvI !== null) {
+                finalUV.push(...sourceUV[uvI]);
+              }
+              cache[keyForCache] = cnt;
               cnt += 1;
             }
           });
 
           // add the second triangle and last vert if quad
-          if (lastIndex) {
-            const cachedIndex = cache[lastIndex];
+          if (lastFace) {
+            const keyForCache = String(lastFace);
+            const cachedIndex = cache[keyForCache];
             if (cachedIndex) {
               finalIndices.push(
                 finalIndices[finalIndices.length - 1],
@@ -61,7 +82,13 @@ class Model {
                 cnt,
                 finalIndices[finalIndices.length - 3]
               );
-              finalVertices.push(...sourceVertices[lastIndex]);
+              const [vI, uvI, nI] = lastFace;
+              if (vI !== null) {
+                finalVertices.push(...sourceVertices[vI]);
+              }
+              if (uvI !== null) {
+                finalUV.push(...sourceUV[uvI]);
+              }
               cnt += 1;
             }
           }
@@ -74,11 +101,14 @@ class Model {
       sourceVertices,
       finalIndices,
       finalVertices,
+      sourceUV,
+      finalUV,
     });
 
     return {
       vertices: finalVertices,
       indices: finalIndices,
+      uv: finalUV,
     };
   };
 }
