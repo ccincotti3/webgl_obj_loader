@@ -111,6 +111,41 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     };
   };
 
+  gl.loadTexture = function (name, image, flipY) {
+    const textureBuffer = this.createTexture();
+    // Flipping the y coord of UV's, make this user configerable since Blender does UV's this way, but IDK about others.
+    if (flipY) {
+      this.pixelStorei(this.UNPACK_FLIP_Y_WEBGL, true);
+    }
+
+    this.bindTexture(this.TEXTURE_2D, textureBuffer);
+    this.texImage2D(
+      this.TEXTURE_2D,
+      0,
+      this.RGBA,
+      this.RGBA,
+      this.UNSIGNED_BYTE,
+      image
+    );
+
+    this.texParameteri(this.TEXTURE_2D, this.TEXTURE_MAG_FILTER, this.LINEAR);
+    this.texParameteri(
+      this.TEXTURE_2D,
+      this.TEXTURE_MIN_FILTER,
+      this.LINEAR_MIPMAP_NEAREST
+    );
+    this.generateMipmap(this.TEXTURE_2D);
+
+    this.bindTexture(this.TEXTURE_2D, null);
+
+    // flip back
+    if (flipY) {
+      this.pixelStorei(this.UNPACK_FLIP_Y_WEBGL, true);
+    }
+
+    return textureBuffer;
+  };
+
   return gl;
 }
 

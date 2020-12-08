@@ -4,6 +4,8 @@ import Renderer from "./renderer";
 import Model from "./model";
 import { Camera, CameraController } from "./camera";
 import { Matrix4, Vector3 } from "../vendor/math";
+import islandFile from "../assets/island.obj"
+import cubeFile from "../assets/cube.obj"
 
 const CANVAS_ID = "gl";
 
@@ -13,17 +15,26 @@ const index = function () {
   gl.setWindowSize(1, 1).setClearColor(1, 1, 1, 1);
   const shader = new Shader(gl);
 
-  // Coming from index.html, ideally this will be a dropzone in the future.
-  const data = document.getElementById("obj_file")?.innerHTML;
-  if (!data) {
-    alert("Object data not found");
-    return null;
-  }
+  let model: Model | null = null;
 
-  const { vertices, indices } = Model.loadObjectSourceToVertices(data);
-  const mesh = gl.createMeshVAO("object", indices, vertices, null, null);
+  fetch(cubeFile)
+    .then((r) => r.text())
+    .then((data) => {
+      if (!data) {
+        alert("Object data not found");
+        return null;
+      }
 
-  const model = new Model(mesh);
+      const { vertices, indices } = Model.loadObjectSourceToVertices(data);
+      if (vertices.length === 0 || indices.length === 0) {
+        console.error("Data is malformed.");
+        return;
+      }
+      const mesh = gl.createMeshVAO("object", indices, vertices, null, null);
+
+      model = new Model(mesh);
+      //   const texture = gl.loadTexture("texture", image, true)
+    });
 
   const camera = new Camera(gl);
   new CameraController(gl, camera);
@@ -32,6 +43,9 @@ const index = function () {
 
   // TODO: if we add auto rotate again, need to rethink fps cb location.
   const rendererCallBack = () => {
+    if (!model) {
+      return;
+    }
     camera.updateViewMatrix();
     // calculate MVP
     const mvpData = Matrix4.identity();
