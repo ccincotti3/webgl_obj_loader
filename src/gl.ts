@@ -1,3 +1,5 @@
+import { ATTR_POSITION_LOC, ATTR_NORMAL_LOC, ATTR_UV_LOC } from "./shader";
+
 function GLInstance(id: string): MyWebGL2RenderingContext {
   const canvas = <HTMLCanvasElement>document.getElementById(id);
   const gl = <MyWebGL2RenderingContext>canvas.getContext("webgl2");
@@ -48,13 +50,6 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     norms,
     uvs
   ): MeshObject {
-    const ATTR_POSITION_NAME = "a_position";
-    const ATTR_POSITION_LOC = 0;
-    const ATTR_NORMAL_NAME = "a_norm";
-    const ATTR_NORMAL_LOC = 1;
-    const ATTR_UV_NAME = "a_uv";
-    const ATTR_UV_LOC = 2;
-
     const vao = gl.createVertexArray();
     let vboVertices = null;
     let vboNormals = null;
@@ -80,15 +75,16 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
       vboNormals = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, vboNormals);
       gl.bufferData(gl.ARRAY_BUFFER, norms, gl.STATIC_DRAW);
-      gl.enableVertexAttribArray(ATTR_POSITION_LOC);
-      gl.vertexAttribPointer(ATTR_POSITION_LOC, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(ATTR_NORMAL_LOC);
+      gl.vertexAttribPointer(ATTR_NORMAL_LOC, 3, gl.FLOAT, false, 0, 0);
     }
     if (uvs) {
+      const data = uvs instanceof Float32Array ? uvs : new Float32Array(uvs);
       vboUVs = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, vboUVs);
-      gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
-      gl.enableVertexAttribArray(ATTR_POSITION_LOC);
-      gl.vertexAttribPointer(ATTR_POSITION_LOC, 2, gl.FLOAT, false, 0, 0);
+      gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(ATTR_UV_LOC);
+      gl.vertexAttribPointer(ATTR_UV_LOC, 2, gl.FLOAT, false, 0, 0);
     }
 
     if (indices) {
@@ -111,7 +107,7 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     };
   };
 
-  gl.loadTexture = function (name, image, flipY) {
+  gl.loadTexture = function (name, image, flipY): WebGLTexture | null {
     const textureBuffer = this.createTexture();
     // Flipping the y coord of UV's, make this user configerable since Blender does UV's this way, but IDK about others.
     if (flipY) {

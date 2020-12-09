@@ -5,7 +5,7 @@ class Model {
   }
 
   // Need to build triangles from our object data.
-  static loadObjectSourceToVertices = (source: string) => {
+  static loadObjectSourceToVertices = (source: string, flipYUV = true) => {
     // Coming from index.html, ideally this will be a dropzone in the future.
     const lines = source?.split("\n");
 
@@ -29,7 +29,13 @@ class Model {
           sourceVertices.push(splitLine.slice(1).map(parseFloat)); // get the verts
           break;
         case "vt":
-          sourceUV.push(splitLine.slice(1).map(parseFloat)); // get the UV coord
+          sourceUV.push(
+            splitLine.slice(1).map((val, i) => {
+              const correctVal =
+                i == 1 && flipYUV ? String(1 - Number(val)) : val;
+              return parseFloat(correctVal);
+            })
+          ); // get the UV coord
           break;
         case "f": {
           const indices = splitLine
@@ -108,7 +114,7 @@ class Model {
     return {
       vertices: finalVertices,
       indices: finalIndices,
-      uv: finalUV,
+      uvs: finalUV,
     };
   };
 }

@@ -1,9 +1,22 @@
 import { Matrix4 } from "../vendor/math.js";
+
+export const ATTR_POSITION_NAME = "a_position";
+export const ATTR_POSITION_LOC = 0;
+export const ATTR_NORMAL_NAME = "a_norm";
+export const ATTR_NORMAL_LOC = 1;
+export const ATTR_UV_NAME = "a_uv";
+export const ATTR_UV_LOC = 2;
+
 const vectorShader = <VertexShaderType>`#version 300 es
     in vec3 a_position;
+    in vec2 a_uv;
 
     uniform mat4 u_MVP;
+
+    out highp vec2 textCoord;
+
     void main(void) {
+        textCoord = a_uv;
         gl_Position = u_MVP * vec4(a_position, 1.0);
     }
 `;
@@ -11,9 +24,13 @@ const vectorShader = <VertexShaderType>`#version 300 es
 const fragmentShader = <FragmentShaderType>`#version 300 es
     precision highp float;
 
+    in highp vec2 textCoord;
+    uniform sampler2D uMainTex;
+
     out vec4 color;
     void main(void) {
-        color = vec4(1.0, 0, 0, 1.0);
+        // color = vec4(textCoord, 1.0, 1.0);
+        color = texture(uMainTex, textCoord);
     }
 `;
 
@@ -22,6 +39,7 @@ export class Shader {
   gl: MyWebGL2RenderingContext;
   positionLocation: number;
   matrixPosition: WebGLUniformLocation | null;
+  texturePosition: WebGLUniformLocation | null;
   constructor(gl: MyWebGL2RenderingContext) {
     const program = ShaderUtil.createProgram(gl, vectorShader, fragmentShader);
     this.program = program;
@@ -33,6 +51,10 @@ export class Shader {
         "a_position"
       );
       this.matrixPosition = this.gl.getUniformLocation(this.program, "u_MVP");
+      this.texturePosition = this.gl.getUniformLocation(
+        this.program,
+        "uMainTex"
+      );
     }
   }
 
@@ -47,6 +69,15 @@ export class Shader {
 
   preRender(mvpData: Matrix4): this {
     this.gl.uniformMatrix4fv(this.matrixPosition, false, mvpData);
+
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureID);
+    this.gl.uniform1i(this.texturePosition, 0);
+    return this;
+  }
+
+  setTextureID(id: WebGLTexture): this {
+    this.textureID = id
     return this;
   }
 
@@ -88,6 +119,11 @@ export class ShaderUtil {
     }
     gl.attachShader(program, vShader);
     gl.attachShader(program, fShader);
+
+    gl.bindAttribLocation(program, ATTR_POSITION_LOC, ATTR_POSITION_NAME);
+    gl.bindAttribLocation(program, ATTR_NORMAL_LOC, ATTR_NORMAL_NAME);
+    gl.bindAttribLocation(program, ATTR_UV_LOC, ATTR_UV_NAME);
+
     gl.linkProgram(program);
 
     const status = <boolean>gl.getProgramParameter(program, gl.LINK_STATUS);

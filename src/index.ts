@@ -4,8 +4,9 @@ import Renderer from "./renderer";
 import Model from "./model";
 import { Camera, CameraController } from "./camera";
 import { Matrix4, Vector3 } from "../vendor/math";
-import islandFile from "../assets/island.obj"
-import cubeFile from "../assets/cube.obj"
+import islandFile from "../assets/island.obj";
+import cubeFile from "../assets/cube.obj";
+import testTextureFile from "../assets/texture_test.jpg";
 
 const CANVAS_ID = "gl";
 
@@ -13,9 +14,10 @@ const index = function () {
   const gl = getGLInstance(CANVAS_ID);
 
   gl.setWindowSize(1, 1).setClearColor(1, 1, 1, 1);
-  const shader = new Shader(gl);
 
   let model: Model | null = null;
+  let loaded = false;
+  const shader = new Shader(gl);
 
   fetch(cubeFile)
     .then((r) => r.text())
@@ -25,15 +27,31 @@ const index = function () {
         return null;
       }
 
-      const { vertices, indices } = Model.loadObjectSourceToVertices(data);
+      const { vertices, indices, uvs } = Model.loadObjectSourceToVertices(data);
       if (vertices.length === 0 || indices.length === 0) {
         console.error("Data is malformed.");
         return;
       }
-      const mesh = gl.createMeshVAO("object", indices, vertices, null, null);
-
+      const mesh = gl.createMeshVAO("object", indices, vertices, null, uvs);
       model = new Model(mesh);
-      //   const texture = gl.loadTexture("texture", image, true)
+
+      fetch(testTextureFile)
+        .then((img) => img.blob())
+        .then((blob) => {
+          const url = URL.createObjectURL(blob);
+          const img = new Image();
+          img.onload = () => {
+            const texture = gl.loadTexture("texture", img, true);
+            if (texture) {
+              console.log("Texture Loaded");
+              shader.setTextureID(texture);
+            }
+
+            URL.revokeObjectURL(url);
+            loaded = true;
+          };
+          img.src = url;
+        });
     });
 
   const camera = new Camera(gl);
@@ -43,7 +61,7 @@ const index = function () {
 
   // TODO: if we add auto rotate again, need to rethink fps cb location.
   const rendererCallBack = () => {
-    if (!model) {
+    if (!loaded) {
       return;
     }
     camera.updateViewMatrix();
