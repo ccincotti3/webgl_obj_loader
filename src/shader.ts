@@ -37,7 +37,6 @@ const fragmentShader = <FragmentShaderType>`#version 300 es
 export class Shader {
   program: WebGLProgram | null;
   gl: MyWebGL2RenderingContext;
-  positionLocation: number;
   matrixPosition: WebGLUniformLocation | null;
   texturePosition: WebGLUniformLocation | null;
   constructor(gl: MyWebGL2RenderingContext) {
@@ -46,10 +45,6 @@ export class Shader {
 
     if (this.program) {
       this.gl = gl;
-      this.positionLocation = this.gl.getAttribLocation(
-        this.program,
-        "a_position"
-      );
       this.matrixPosition = this.gl.getUniformLocation(this.program, "u_MVP");
       this.texturePosition = this.gl.getUniformLocation(
         this.program,
@@ -77,7 +72,7 @@ export class Shader {
   }
 
   setTextureID(id: WebGLTexture): this {
-    this.textureID = id
+    this.textureID = id;
     return this;
   }
 

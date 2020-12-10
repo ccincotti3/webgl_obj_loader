@@ -5,8 +5,10 @@ import Model from "./model";
 import { Camera, CameraController } from "./camera";
 import { Matrix4, Vector3 } from "../vendor/math";
 import islandFile from "../assets/island.obj";
-import cubeFile from "../assets/cube.obj";
+import pirateFile from "../assets/pirate.obj";
 import testTextureFile from "../assets/texture_test.jpg";
+import pirateTextureFile from "../assets/pirate.png";
+import cubeFile from "../assets/cube.obj";
 
 const CANVAS_ID = "gl";
 
@@ -19,7 +21,7 @@ const index = function () {
   let loaded = false;
   const shader = new Shader(gl);
 
-  fetch(cubeFile)
+  fetch(pirateFile)
     .then((r) => r.text())
     .then((data) => {
       if (!data) {
@@ -35,7 +37,7 @@ const index = function () {
       const mesh = gl.createMeshVAO("object", indices, vertices, null, uvs);
       model = new Model(mesh);
 
-      fetch(testTextureFile)
+      fetch(pirateTextureFile)
         .then((img) => img.blob())
         .then((blob) => {
           const url = URL.createObjectURL(blob);

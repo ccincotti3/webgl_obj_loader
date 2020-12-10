@@ -5,7 +5,7 @@ class Model {
   }
 
   // Need to build triangles from our object data.
-  static loadObjectSourceToVertices = (source: string, flipYUV = true) => {
+  static loadObjectSourceToVertices = (source: string, flipYUV = false) => {
     // Coming from index.html, ideally this will be a dropzone in the future.
     const lines = source?.split("\n");
 
@@ -56,7 +56,7 @@ class Model {
           indices.forEach((i) => {
             const keyForCache = String(i);
             const cachedIndex = cache[keyForCache];
-            if (cachedIndex) {
+            if (cachedIndex !== undefined) {
               finalIndices.push(cachedIndex);
             } else {
               const [vI, uvI, nI] = i;
@@ -76,7 +76,7 @@ class Model {
           if (lastFace) {
             const keyForCache = String(lastFace);
             const cachedIndex = cache[keyForCache];
-            if (cachedIndex) {
+            if (cachedIndex !== undefined) {
               finalIndices.push(
                 finalIndices[finalIndices.length - 1],
                 cachedIndex,

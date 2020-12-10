@@ -107,7 +107,7 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     };
   };
 
-  gl.loadTexture = function (name, image, flipY): WebGLTexture | null {
+  gl.loadTexture = function (name, image, flipY = true): WebGLTexture | null {
     const textureBuffer = this.createTexture();
     // Flipping the y coord of UV's, make this user configerable since Blender does UV's this way, but IDK about others.
     if (flipY) {
@@ -136,7 +136,7 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
 
     // flip back
     if (flipY) {
-      this.pixelStorei(this.UNPACK_FLIP_Y_WEBGL, true);
+      this.pixelStorei(this.UNPACK_FLIP_Y_WEBGL, false);
     }
 
     return textureBuffer;
