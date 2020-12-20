@@ -1,5 +1,5 @@
-import { Matrix4, Vector3 } from "../vendor/math";
-import Transformable, { TransformType } from "./transformable";
+import { Matrix4 } from "../vendor/math";
+import Transformable from "./transformable";
 
 export class Camera extends Transformable {
   projectionMatrix: Matrix4;

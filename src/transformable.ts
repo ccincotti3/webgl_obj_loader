@@ -19,6 +19,17 @@ export default class Transformable {
     };
   }
 
+  setPosition(x, y, z) {
+    this.transform.position.set(x, y, z);
+    return this;
+  }
+  addRotation(x, y, z) {
+    this.transform.rotation.x += x;
+    this.transform.rotation.y += y;
+    this.transform.rotation.z += z;
+    return this;
+  }
+
   updateDirection = () => {
     const { right, up, forward, viewMatrix } = this.transform;
     Matrix4.transformVec4(right, [1, 0, 0, 0], viewMatrix.raw); //

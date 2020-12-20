@@ -6,6 +6,7 @@ export default class Model extends Transformable {
     this.mesh = mesh;
   }
 
+
   static create = (
     gl: MyWebGL2RenderingContext,
     data: string
