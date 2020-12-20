@@ -9,11 +9,19 @@
             background-color: black;
             text-align: center;
         }
+        #drop_zone {
+            width: 100%;
+            position: absolute;
+            height: 100%;
+            border: turquoise 1px dashed;
+        }
     </style>
 </head>
 <body>
-   <canvas id="gl"></canvas>
+    <div id="drop_zone">
+        <p>Drag one or more files to this Drop Zone ...</p>
+    </div>
+    <canvas id="gl"></canvas>
 </body>
 <script src="src/index.ts"></script>
-<!-- <img src="./assets/texture_test.jpg" id="imgTex" style="display: none;" /> -->
 </html>

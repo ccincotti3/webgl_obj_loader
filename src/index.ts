@@ -9,52 +9,52 @@ import pirateFile from "../assets/pirate.obj";
 import testTextureFile from "../assets/texture_test.jpg";
 import pirateTextureFile from "../assets/pirate.png";
 import cubeFile from "../assets/cube.obj";
+import Dropbox from "./dropbox";
 
 const CANVAS_ID = "gl";
 
 const index = function () {
   const gl = getGLInstance(CANVAS_ID);
+  let model: Model | null = null;
+  let loaded = false;
+  const dropbox = new Dropbox("drop_zone", (data: string) => {
+    console.log(Model)
+    model = Model.create(gl, data);
+    loaded = true;
+  });
 
   gl.setWindowSize(1, 1).setClearColor(1, 1, 1, 1);
 
-  let model: Model | null = null;
-  let loaded = false;
   const shader = new Shader(gl);
 
-  fetch(pirateFile)
-    .then((r) => r.text())
-    .then((data) => {
-      if (!data) {
-        alert("Object data not found");
-        return null;
-      }
+  // fetch(pirateFile)
+  //   .then((r) => r.text())
+  //   .then((data) => {
+  //     if (!data) {
+  //       alert("Object data not found");
+  //       return null;
+  //     }
 
-      const { vertices, indices, uvs } = Model.loadObjectSourceToVertices(data);
-      if (vertices.length === 0 || indices.length === 0) {
-        console.error("Data is malformed.");
-        return;
-      }
-      const mesh = gl.createMeshVAO("object", indices, vertices, null, uvs);
-      model = new Model(mesh);
+  //     model = Model.create(gl, data);
 
-      fetch(pirateTextureFile)
-        .then((img) => img.blob())
-        .then((blob) => {
-          const url = URL.createObjectURL(blob);
-          const img = new Image();
-          img.onload = () => {
-            const texture = gl.loadTexture("texture", img, true);
-            if (texture) {
-              console.log("Texture Loaded");
-              shader.setTextureID(texture);
-            }
+  //     fetch(pirateTextureFile)
+  //       .then((img) => img.blob())
+  //       .then((blob) => {
+  //         const url = URL.createObjectURL(blob);
+  //         const img = new Image();
+  //         img.onload = () => {
+  //           const texture = gl.loadTexture("texture", img, true);
+  //           if (texture) {
+  //             console.log("Texture Loaded");
+  //             shader.setTextureID(texture);
+  //           }
 
-            URL.revokeObjectURL(url);
-            loaded = true;
-          };
-          img.src = url;
-        });
-    });
+  //           URL.revokeObjectURL(url);
+  //           loaded = true;
+  //         };
+  //         img.src = url;
+  //       });
+  //   });
 
   const camera = new Camera(gl);
   new CameraController(gl, camera);
@@ -70,6 +70,7 @@ const index = function () {
     // calculate MVP
     const mvpData = Matrix4.identity();
     Matrix4.mult(mvpData, camera.projectionMatrix.raw, camera.viewMatrixState);
+    Matrix4.mult(mvpData, mvpData, model.transform.viewMatrix.raw)
 
     shader.activate().preRender(mvpData).render(model).deactivate();
   };

@@ -1,8 +1,23 @@
-class Model {
+import Transformable from "./transformable";
+export default class Model extends Transformable {
   mesh: MeshObject;
   constructor(mesh: MeshObject) {
+    super();
     this.mesh = mesh;
   }
+
+  static create = (
+    gl: MyWebGL2RenderingContext,
+    data: string
+  ): Model | null => {
+    const { vertices, indices, uvs } = Model.loadObjectSourceToVertices(data);
+    if (vertices.length === 0 || indices.length === 0) {
+      console.error("Data is malformed.");
+      return null;
+    }
+    const mesh = gl.createMeshVAO("object", indices, vertices, null, uvs);
+    return new Model(mesh);
+  };
 
   // Need to build triangles from our object data.
   static loadObjectSourceToVertices = (source: string, flipYUV = false) => {
@@ -118,5 +133,3 @@ class Model {
     };
   };
 }
-
-export default Model;

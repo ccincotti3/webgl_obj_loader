@@ -1,22 +1,13 @@
 import { Matrix4, Vector3 } from "../vendor/math";
-import withTransform, { TransformType } from "./decorators/withTransform";
+import Transformable, { TransformType } from "./transformable";
 
-@withTransform
-export class Camera {
-  transform: TransformType;
+export class Camera extends Transformable {
   projectionMatrix: Matrix4;
   viewMatrix: Matrix4;
   viewMatrixState: Matrix4;
   resetMatrix: () => Matrix4;
-  constructor(
-    gl: MyWebGL2RenderingContext,
-    transform: TransformType,
-    fov = 45,
-    near = 0.1,
-    far = 100.0
-  ) {
-    this.transform = transform;
-
+  constructor(gl: MyWebGL2RenderingContext, fov = 45, near = 0.1, far = 100.0) {
+    super();
     this.viewMatrixState = new Float32Array(16); // Cache current state
     this.resetMatrix = this._setPerspective(gl, fov, near, far);
     this.projectionMatrix = this.resetMatrix();
@@ -53,7 +44,7 @@ export class Camera {
       .rotateY(this.transform.rotation.y * this.transform.DEG_2_RAD)
       .vtranslate(this.transform.position);
 
-    this.transform.updateDirection();
+    this.updateDirection();
 
     // Cameras work by doing the inverse transformation of all meshes!
     Matrix4.invert(this.viewMatrixState, this.transform.viewMatrix.raw);
@@ -95,8 +86,8 @@ export class CameraController {
     this.onUpHandler = this.onMouseUp;
     this.onMoveHandler = this.onMouseMove;
 
-    this.canvas.addEventListener("mousedown", (e) => this.onMouseDown(e));
-    this.canvas.addEventListener(
+    window.addEventListener("mousedown", (e) => this.onMouseDown(e));
+    window.addEventListener(
       "wheel",
       (e) => {
         e.preventDefault(); // Need to prevent window from zooming
@@ -119,17 +110,17 @@ export class CameraController {
     this.initX = this.prevX = e.pageX - this.offsetX;
     this.initY = this.prevY = e.pageY - this.offsetY;
 
-    this.canvas.addEventListener("mouseup", this.onUpHandler);
-    this.canvas.addEventListener("mousemove", this.onMoveHandler);
+    window.addEventListener("mouseup", this.onUpHandler);
+    window.addEventListener("mousemove", this.onMoveHandler);
   };
 
   //End listening for dragging movement
   onMouseUp = (): void => {
-    this.canvas.removeEventListener("mouseup", this.onUpHandler);
-    this.canvas.removeEventListener("mousemove", this.onMoveHandler);
+    window.removeEventListener("mouseup", this.onUpHandler);
+    window.removeEventListener("mousemove", this.onMoveHandler);
   };
 
-  onMouseWheel = (e: MouseWheelEvent): void => {
+  onMouseWheel = (e: WheelEvent): void => {
     const delta = Math.max(-1, Math.min(1, e.deltaY || -e.detail)); //Try to map wheel movement to a number between -1 and 1
     this.camera.panZ(delta * (this.zoomRate / this.canvas.height)); //Keep the movement speed the same, no matter the height diff
   };
