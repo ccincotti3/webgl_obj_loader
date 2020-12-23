@@ -18,13 +18,15 @@
     </style>
 </head>
 <body>
-    <input id="color_uv" type="checkbox">UV</input>
-    <input type="checkbox">Normal</input>
-    <input type="checkbox">Position</input>
-    <div id="drop_zone">
-        <p>Drag one or more files to this Drop Zone ...</p>
+    <input id="color_uv" type="range" min=0.0 max=1.0 step=0.01>UV</input>
+    <input id="color_position" type="range" min=0.0 max=1.0 step=0.01>Normal</input>
+    <input id="color_normals" type="range" min=0.0 max=1.0 step=0.01>Position</input>
+    <div>
+        <div id="drop_zone">
+            <p>Drag one or more files to this Drop Zone ...</p>
+        </div>
+        <canvas id="gl"></canvas>
     </div>
-    <canvas id="gl"></canvas>
 </body>
 <script src="src/index.ts"></script>
 </html>
