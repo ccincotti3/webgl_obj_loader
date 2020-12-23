@@ -1,10 +1,10 @@
 import getGLInstance from "./gl";
-import { Shader } from "./shader";
+import MainObjectProgram from "./programs/mainObject";
 import Renderer from "./renderer";
 import Model from "./model";
 import { Camera, CameraController } from "./camera";
 import { Matrix4 } from "../vendor/math";
-// import islandFile from "../assets/island.obj";
+import islandFile from "../assets/island.obj";
 // import pirateFile from "../assets/pirate.obj";
 // import testTextureFile from "../assets/texture_test.jpg";
 // import pirateTextureFile from "../assets/pirate.png";
@@ -20,12 +20,13 @@ const index = function () {
   const dropbox = new Dropbox("drop_zone", (data: string) => {
     model = Model.create(gl, data);
     model?.setPosition(0, 0, 0);
-    isStartingCube = false
+    console.log("loaded")
+    isStartingCube = false;
   });
 
-  gl.setWindowSize(1, 1).setClearColor(1, 1, 1, 1);
+  gl.setWindowSize(1, 1).setClearColor(0, 0, 0, 0);
 
-  const shader = new Shader(gl);
+  const shader = new MainObjectProgram(gl);
 
   fetch(cubeFile)
     .then((r) => r.text())
@@ -67,8 +68,8 @@ const index = function () {
     if (!model) {
       return;
     }
-    if(isStartingCube) {
-      camera.addRotation(-0.1, 0.1, 0)
+    if (isStartingCube) {
+      camera.addRotation(0, 0.1, 0);
     }
     model.updateViewMatrix();
     camera.updateViewMatrix();

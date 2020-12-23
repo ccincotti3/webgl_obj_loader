@@ -1,4 +1,4 @@
-import { ATTR_POSITION_LOC, ATTR_NORMAL_LOC, ATTR_UV_LOC } from "./shader";
+import { ATTR_POSITION_LOC, ATTR_NORMAL_LOC, ATTR_UV_LOC } from "./programs/shader";
 
 function GLInstance(id: string): MyWebGL2RenderingContext {
   const canvas = <HTMLCanvasElement>document.getElementById(id);
@@ -72,9 +72,11 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
     }
 
     if (norms) {
+      const data =
+        norms instanceof Float32Array ? norms : new Float32Array(norms);
       vboNormals = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, vboNormals);
-      gl.bufferData(gl.ARRAY_BUFFER, norms, gl.STATIC_DRAW);
+      gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
       gl.enableVertexAttribArray(ATTR_NORMAL_LOC);
       gl.vertexAttribPointer(ATTR_NORMAL_LOC, 3, gl.FLOAT, false, 0, 0);
     }

@@ -6,17 +6,18 @@ export default class Model extends Transformable {
     this.mesh = mesh;
   }
 
-
   static create = (
     gl: MyWebGL2RenderingContext,
     data: string
   ): Model | null => {
-    const { vertices, indices, uvs } = Model.loadObjectSourceToVertices(data);
+    const { vertices, indices, uvs, norms } = Model.loadObjectSourceToVertices(
+      data
+    );
     if (vertices.length === 0 || indices.length === 0) {
       console.error("Data is malformed.");
       return null;
     }
-    const mesh = gl.createMeshVAO("object", indices, vertices, null, uvs);
+    const mesh = gl.createMeshVAO("object", indices, vertices, norms, uvs);
     return new Model(mesh);
   };
 
@@ -28,9 +29,11 @@ export default class Model extends Transformable {
     // Store what's in the object file here
     const sourceVertices: number[][] = [];
     const sourceUV: number[][] = [];
+    const sourceNormals: number[][] = [];
 
     const finalVertices: number[] = []; // float32
     const finalUV: number[] = []; // float32
+    const finalNormals: number[] = []; //float32
     const finalIndices: number[] = []; //uInt16
 
     const cache: { [vertices: string]: number } = {};
@@ -43,6 +46,9 @@ export default class Model extends Transformable {
       switch (startingChar) {
         case "v":
           sourceVertices.push(splitLine.slice(1).map(parseFloat)); // get the verts
+          break;
+        case "vn":
+          sourceNormals.push(splitLine.slice(1).map(parseFloat)); // get the normals
           break;
         case "vt":
           sourceUV.push(
@@ -83,6 +89,9 @@ export default class Model extends Transformable {
               if (uvI !== null) {
                 finalUV.push(...sourceUV[uvI]);
               }
+              if (nI !== null) {
+                finalNormals.push(...sourceNormals[nI]);
+              }
               cache[keyForCache] = cnt;
               cnt += 1;
             }
@@ -111,6 +120,9 @@ export default class Model extends Transformable {
               if (uvI !== null) {
                 finalUV.push(...sourceUV[uvI]);
               }
+              if (nI !== null) {
+                finalNormals.push(...sourceNormals[nI]);
+              }
               cnt += 1;
             }
           }
@@ -125,12 +137,14 @@ export default class Model extends Transformable {
       finalVertices,
       sourceUV,
       finalUV,
+      finalNormals,
     });
 
     return {
       vertices: finalVertices,
       indices: finalIndices,
       uvs: finalUV,
+      norms: finalNormals,
     };
   };
 }

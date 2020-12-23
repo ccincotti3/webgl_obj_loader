@@ -11,7 +11,7 @@ interface MyWebGL2RenderingContext extends WebGL2RenderingContext {
     name: string,
     indices: number[] | Uint16Array | null,
     vertices: number[] | Float32Array | null,
-    norms: Float32Array | null,
+    norms: number[] | Float32Array | null,
     uvs: number[] | Float32Array | null
   ): MeshObject;
   loadTexture(

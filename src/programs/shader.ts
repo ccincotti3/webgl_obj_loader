@@ -1,4 +1,4 @@
-import { Matrix4 } from "../vendor/math.js";
+import { Matrix4 } from "../../vendor/math.js";
 
 export const ATTR_POSITION_NAME = "a_position";
 export const ATTR_POSITION_LOC = 0;
@@ -7,40 +7,19 @@ export const ATTR_NORMAL_LOC = 1;
 export const ATTR_UV_NAME = "a_uv";
 export const ATTR_UV_LOC = 2;
 
-const vectorShader = <VertexShaderType>`#version 300 es
-    in vec3 a_position;
-    in vec2 a_uv;
-
-    uniform mat4 u_MVP;
-
-    out highp vec2 textCoord;
-
-    void main(void) {
-        textCoord = a_uv;
-        gl_Position = u_MVP * vec4(a_position, 1.0);
-    }
-`;
-
-const fragmentShader = <FragmentShaderType>`#version 300 es
-    precision highp float;
-
-    in highp vec2 textCoord;
-    uniform sampler2D uMainTex;
-
-    out vec4 color;
-    void main(void) {
-        // color = vec4(textCoord, 1.0, 1.0);
-        color = texture(uMainTex, textCoord);
-    }
-`;
-
-export class Shader {
+export default class Shader {
   program: WebGLProgram | null;
   gl: MyWebGL2RenderingContext;
   matrixPosition: WebGLUniformLocation | null;
   texturePosition: WebGLUniformLocation | null;
-  constructor(gl: MyWebGL2RenderingContext) {
-    const program = ShaderUtil.createProgram(gl, vectorShader, fragmentShader);
+  vertexShader: VertexShaderType;
+  fragmentShader: FragmentShaderType;
+  constructor(
+    gl: MyWebGL2RenderingContext,
+    vertexShader: VertexShaderType,
+    fragmentShader: FragmentShaderType
+  ) {
+    const program = ShaderUtil.createProgram(gl, vertexShader, fragmentShader);
     this.program = program;
 
     if (this.program) {
