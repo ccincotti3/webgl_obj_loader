@@ -1,32 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carmen Cincotti's .obj viewer</title>
     <style>
         body {
-            background-color: rgb(191,239,255);
+            background-color: rgb(191, 239, 255);
             text-align: center;
         }
+
         #drop_zone {
             width: 100%;
             position: absolute;
             height: 100%;
             border: turquoise 1px dashed;
         }
+        #input_group {
+            padding: 1rem;
+        }
     </style>
 </head>
+
 <body>
-    <input id="color_uv" type="range" min=0.0 max=1.0 step=0.01>UV</input>
-    <input id="color_position" type="range" min=0.0 max=1.0 step=0.01>Normal</input>
-    <input id="color_normals" type="range" min=0.0 max=1.0 step=0.01>Position</input>
+    <div id="input_group">
+        <input id="color_uv" type="range" min=0.0 max=1.0 step=0.01>UV</input>
+        <input id="color_position" type="range" min=0.0 max=1.0 step=0.01>Normal</input>
+        <input id="color_normals" type="range" min=0.0 max=1.0 step=0.01>Position</input>
+        <div>
+            <select id="model_selection">
+                <option selected value="cube">Cube</option>
+                <option value="island">Island</option>
+                <option value="pirate">Pirate</option>
+                <option disabled>Custom</option>
+            </select>
+        </div>
+    </div>
     <div>
         <div id="drop_zone">
-            <p>Drag one or more files to this Drop Zone ...</p>
+            <p>Drag .OBJ file in to load</p>
         </div>
         <canvas id="gl"></canvas>
     </div>
 </body>
 <script src="src/index.ts"></script>
+
 </html>

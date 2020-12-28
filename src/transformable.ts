@@ -5,6 +5,10 @@ const DEG_2_RAD = Math.PI / 180;
 export default class Transformable {
   transform: TransformType;
   constructor() {
+    this.initTransform();
+  }
+
+  initTransform() {
     this.transform = {
       position: new Vector3(0, 0, 0),
       scale: new Vector3(1, 1, 1),
@@ -17,6 +21,8 @@ export default class Transformable {
       forward: new Vector3(0, 0, 0),
       DEG_2_RAD: DEG_2_RAD,
     };
+
+    return this;
   }
 
   setPosition(x, y, z) {

@@ -1,4 +1,8 @@
-import { ATTR_POSITION_LOC, ATTR_NORMAL_LOC, ATTR_UV_LOC } from "./programs/shader";
+import {
+  ATTR_POSITION_LOC,
+  ATTR_NORMAL_LOC,
+  ATTR_UV_LOC,
+} from "./programs/shader";
 
 function GLInstance(id: string): MyWebGL2RenderingContext {
   const canvas = <HTMLCanvasElement>document.getElementById(id);
@@ -96,6 +100,10 @@ function GLInstance(id: string): MyWebGL2RenderingContext {
       ibo = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    }
+
+    if (!uvs?.length) {
+      alert("UVs not found, please unwrap model and export .obj again.");
     }
 
     return {
