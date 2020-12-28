@@ -9,14 +9,10 @@ export default class Dropbox {
     }
   }
   dragOverHandler(ev: DragEvent): void {
-    console.log("File(s) in drop zone");
-
     // Prevent default behavior (Prevent file from being opened)
     ev.preventDefault();
   }
   dropHandler(ev: DragEvent): void {
-    console.log("File(s) dropped");
-
     // Prevent default behavior (Prevent file from being opened)
     ev.preventDefault();
 

@@ -19,7 +19,7 @@ const loadModel = (gl: MyWebGL2RenderingContext, data: string) => {
 
 const index = function () {
   let model: Model | null = null;
-  let isStartingCube = true;
+  let isStartingCube = <null | boolean>null;
 
   const gl = getGLInstance(CANVAS_ID);
 
@@ -29,18 +29,23 @@ const index = function () {
 
   const fetchFile = (name: string) => {
     let filePath;
+    let position: number[];
     switch (name) {
       case "cube":
         filePath = cubeFile;
+        position = [0, 0, 5.0];
         break;
       case "pirate":
         filePath = pirateFile;
+        position = [0, 1.0, 7.0];
         break;
       case "island":
         filePath = islandFile;
+        position = [0, 0, 20.0];
         break;
       default:
         filePath = cubeFile;
+        position = [0, 0, 5.0];
     }
     fetch(filePath)
       .then((r) => r.text())
@@ -51,8 +56,8 @@ const index = function () {
         }
 
         model = loadModel(gl, data);
-        camera.initTransform().setPosition(0, 0, 5.0);
-        isStartingCube = true;
+        camera.initTransform().setPosition(...position);
+        isStartingCube = isStartingCube === null ? true : false;
 
         // fetch(islandFile)
         //   .then((img) => img.blob())
@@ -83,17 +88,21 @@ const index = function () {
     e.stopPropagation();
   });
 
+  window.addEventListener("resize", () => {
+    gl.setWindowSize(1, 1);
+  });
+
   fetchFile("cube");
 
   new Dropbox("drop_zone", (data: string) => {
     isStartingCube = false;
-    loadModel(gl, data);
+    model = loadModel(gl, data);
+    camera.initTransform().setPosition(0, 0, 5);
   });
 
   gl.setWindowSize(1, 1).setClearColor(0, 0, 0, 0);
 
   const shader = new MainObjectProgram(gl);
-
   const renderer = new Renderer(gl);
 
   // TODO: if we add auto rotate again, need to rethink fps cb location.
