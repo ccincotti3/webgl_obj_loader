@@ -1,6 +1,6 @@
 # Carmen's .OBJ loader
 
-This is a fun project I did to familiarize myself with the underlying WebGL API, and better understand the relationshi between WebGL, GLSL, etc. 
+This is a fun project I did to familiarize myself with the underlying WebGL API, and better understand the relationshi between WebGL, GLSL, etc. Also this is a first deep dive into typescript.
 
 You can se the relationship between the different vertices loaded in. A .OBJ file is just a text file with a list of position, normal, and UV values that make up the model. 
 
@@ -10,3 +10,6 @@ Also, you can add an an image and that will apply a texture. The Pirate girl exa
 
 ## To view
 Check out [this live demo!](https://ccincotti3.github.io/webgl_obj_loader/)
+
+## TODO
+Refactoring. I was so excited to get this project finished that I definitely neglected some DRY principles. Will be revisiting this soon.
