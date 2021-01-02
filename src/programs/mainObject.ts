@@ -30,15 +30,15 @@ const fragmentShader = <FragmentShaderType>`#version 300 es
     uniform float uUVWeight;
     uniform float uNormalWeight;
     uniform float uPositionWeight;
+    uniform float uTextureWeight;
     uniform sampler2D uMainTex;
 
     out vec4 color;
     void main(void) {
-        // color = vec4(textCoord, 1.0, 1.0);
-        // color = texture(uMainTex, textCoord);
         color = vec4(uvCoord, 1.0, 1.0) * uUVWeight 
                 + vec4(normalCoord, 1.0) * uNormalWeight
-                + vec4(positionCoord, 1.0) * uPositionWeight;
+                + vec4(positionCoord, 1.0) * uPositionWeight
+                + texture(uMainTex, uvCoord) * uTextureWeight;
     }
 `;
 
@@ -46,6 +46,7 @@ export default class MainObject extends Shader {
   uvWeightPosition: WebGLUniformLocation | null;
   normalWeightPosition: WebGLUniformLocation | null;
   positionWeightPosition: WebGLUniformLocation | null;
+  textureWeightPosition: WebGLUniformLocation | null;
   constructor(gl: MyWebGL2RenderingContext) {
     super(gl, vertexShader, fragmentShader);
 
@@ -62,6 +63,10 @@ export default class MainObject extends Shader {
         this.program,
         "uPositionWeight"
       );
+      this.textureWeightPosition = this.gl.getUniformLocation(
+        this.program,
+        "uTextureWeight"
+      );
     }
   }
 
@@ -69,9 +74,11 @@ export default class MainObject extends Shader {
     const uvWeight = document.querySelector("#color_uv")?.value;
     const normalWeight = document.querySelector("#color_position")?.value;
     const positionWeight = document.querySelector("#color_normals")?.value;
+    const textureWeight = document.querySelector("#color_texture")?.value;
     this.gl.uniform1f(this.uvWeightPosition, uvWeight);
     this.gl.uniform1f(this.normalWeightPosition, normalWeight);
     this.gl.uniform1f(this.positionWeightPosition, positionWeight);
+    this.gl.uniform1f(this.textureWeightPosition, textureWeight);
     return super.preRender(mvpData);
   }
 }

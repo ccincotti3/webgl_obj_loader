@@ -6,7 +6,6 @@ import { Camera, CameraController } from "./camera";
 import { Matrix4 } from "../vendor/math";
 import islandFile from "../assets/island.obj";
 import pirateFile from "../assets/pirate.obj";
-// import testTextureFile from "../assets/texture_test.jpg";
 import pirateTextureFile from "../assets/pirate.png";
 import cubeFile from "../assets/cube.obj";
 import Dropbox from "./dropbox";
@@ -29,6 +28,7 @@ const index = function () {
 
   const fetchFile = (name: string) => {
     let filePath;
+    let texturePath;
     let position: number[];
     switch (name) {
       case "cube":
@@ -36,11 +36,20 @@ const index = function () {
         position = [0, 0, 5.0];
         break;
       case "pirate":
+      case "pirate_with_texture":
+        if (name === "pirate_with_texture") {
+          texturePath = pirateTextureFile;
+        }
         filePath = pirateFile;
         position = [0, 1.0, 7.0];
         break;
       case "island":
         filePath = islandFile;
+        position = [0, 0, 20.0];
+        break;
+      case "custom":
+        filePath = "";
+        alert("Drag file into the center");
         position = [0, 0, 20.0];
         break;
       default:
@@ -59,22 +68,23 @@ const index = function () {
         camera.initTransform().setPosition(...position);
         isStartingCube = isStartingCube === null ? true : false;
 
-        // fetch(islandFile)
-        //   .then((img) => img.blob())
-        //   .then((blob) => {
-        //     const url = URL.createObjectURL(blob);
-        //     const img = new Image();
-        //     img.onload = () => {
-        //       const texture = gl.loadTexture("texture", img, true);
-        //       if (texture) {
-        //         shader.setTextureID(texture);
-        //       }
+        if (texturePath) {
+          fetch(texturePath)
+            .then((img) => img.blob())
+            .then((blob) => {
+              const url = URL.createObjectURL(blob);
+              const img = new Image();
+              img.onload = () => {
+                const texture = gl.loadTexture("texture", img, true);
+                if (texture) {
+                  shader.setTextureID(texture);
+                }
 
-        //       URL.revokeObjectURL(url);
-        //       loaded = true;
-        //     };
-        //     img.src = url;
-        //   });
+                URL.revokeObjectURL(url);
+              };
+              img.src = url;
+            });
+        }
       });
   };
   document
@@ -94,18 +104,26 @@ const index = function () {
 
   fetchFile("cube");
 
-  new Dropbox("drop_zone", (data: string) => {
-    isStartingCube = false;
-    model = loadModel(gl, data);
-    camera.initTransform().setPosition(0, 0, 5);
-  });
+  new Dropbox(
+    "drop_zone",
+    (data: string) => {
+      isStartingCube = false;
+      model = loadModel(gl, data);
+      camera.initTransform().setPosition(0, 0, 5);
+    },
+    (img: Blob) => {
+      const texture = gl.loadTexture("texture", img, true);
+      if (texture) {
+        shader.setTextureID(texture);
+      }
+    }
+  );
 
   gl.setWindowSize(1, 1).setClearColor(0, 0, 0, 0);
 
   const shader = new MainObjectProgram(gl);
   const renderer = new Renderer(gl);
 
-  // TODO: if we add auto rotate again, need to rethink fps cb location.
   const rendererCallBack = () => {
     if (!model) {
       return;
